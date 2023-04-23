@@ -1,9 +1,9 @@
-import { Fib } from '../src/fib';
+import { Fib } from '../src/index';
 
 // your fib cleint
-const client_id: string = 'client_id';
+const client_id = 'client_id';
 // your fib secret
-const client_secret: string = 'client_secret';
+const client_secret = 'client_secret';
 
 describe('Tetsing payment process', () => {
   const fib = new Fib();
@@ -30,7 +30,7 @@ describe('Tetsing payment process', () => {
     console.log('payment status data: ', paymentStatusResponse.data);
 
     // canceling payment
-    let isCanceled = await payment.cancel();
+    const isCanceled = await payment.cancel();
     expect(isCanceled).toEqual(true);
   });
 });

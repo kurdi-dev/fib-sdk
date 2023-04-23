@@ -8,23 +8,23 @@ import { Axios } from 'axios';
 
 export default class Payment {
   private readonly http: Axios;
-  public paymentId: string = '';
-  public qrCode: string = '';
-  public readableCode: string = '';
-  public personalAppLink: string = '';
-  public businessAppLink: string = '';
-  public corporateAppLink: string = '';
-  public validUntil: string = '';
-  public amount: number = 0;
+  public paymentId = '';
+  public qrCode = '';
+  public readableCode = '';
+  public personalAppLink = '';
+  public businessAppLink = '';
+  public corporateAppLink = '';
+  public validUntil = '';
+  public amount = 0;
   public currency: 'IQD' | 'USD' = 'IQD';
-  public status: string = 'NO_PAYMENT';
+  public status = 'NO_PAYMENT';
 
   constructor(http: Axios) {
     this.http = http;
   }
 
   async create(
-    payload: CreatePaymentQueryParams
+    payload: CreatePaymentQueryParams,
   ): Promise<CreatePaymentQueryResponse | BadRequest> {
     return await this.http
       .post('/', JSON.stringify(payload))
@@ -85,5 +85,3 @@ export default class Payment {
     this.status = 'NO_PAYMENT';
   }
 }
-
-module.exports = Payment;

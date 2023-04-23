@@ -1,6 +1,6 @@
 import axios, { Axios } from 'axios';
 import Payment from './payment/payment';
-const qs = require('qs');
+import * as qs from 'qs';
 
 /**
  * FIB SDK
@@ -10,7 +10,7 @@ const qs = require('qs');
 export class Fib {
   private http: Axios;
   public accessToken: string;
-  public status: string = 'PENDING';
+  public status: string;
   public payment: Payment;
 
   constructor() {
@@ -30,7 +30,7 @@ export class Fib {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-        }
+        },
       )
       .then((response) => {
         if (response.data?.access_token) {

@@ -1,10 +1,8 @@
 {
-  "extends": "@tsconfig/recommended/tsconfig.json",
-  "include": ["src", "types"],
   "compilerOptions": {
     "experimentalDecorators": true,
     "target": "es6",
-    "module": "ES2015",
+    "module": "commonjs",
     "moduleResolution": "node",
     "declaration": true,
     "outDir": "./dist",
@@ -12,6 +10,19 @@
     "strict": true,
     "checkJs": true,
     "allowSyntheticDefaultImports": true,
-    "strictNullChecks": false
-  }
+    "strictNullChecks": false,
+    "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+    "strictFunctionTypes": true /* Enable strict checking of function types. */,
+    "noUnusedLocals": true /* Report errors on unused locals. */,
+    "noUnusedParameters": false /* Report errors on unused parameters. */,
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+    "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
+    "importHelpers": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "types": ["node", "jest"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }
