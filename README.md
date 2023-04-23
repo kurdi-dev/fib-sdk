@@ -1,6 +1,6 @@
 # FIB (First Iraqi Bank)'s payment SDK
 
-A Node.js sdk for First Iraqi Bank's online payment.
+A Node.js SDK for First Iraqi Bank's online payment.
 
 [![kurdi-dev - fib-sdk](https://img.shields.io/static/v1?label=kurdi-dev&message=fib-sdk&color=blue&logo=github)](https://github.com/kurdi-dev/fib-sdk 'Go to GitHub repo')
 [![contributions - welcome](https://img.shields.io/badge/contributions-welcome-blue)](/CONTRIBUTING.md 'Go to contributions doc')
@@ -55,13 +55,13 @@ const fib = new Fib();
 
 ## Authentication
 
-Authenticating with FIB using client_id and client_secret that you have recieved from FIB
+Authenticating with FIB using client_id and client_secret that you have received from FIB
 
 ```ts
 await fib.authenticate(clientId:string, clientSecret:string);
 ```
 
-You can get `status` and `accessToken` information from the payment instance, for example after successful authentication the Fib instance status field should equals READY
+You can get `status` and `accessToken` information from the payment instance, for example after successful authentication the Fib instance status field should equal `READY`
 
 ```js
 let status = fib.status; // PENDING | INITIATED | READY | FAILED
@@ -69,7 +69,7 @@ let status = fib.status; // PENDING | INITIATED | READY | FAILED
 
 ### Create a payment instance
 
-After creating an Fib instance and authenticating, you can create a payment instance by calling the `create()` method from the payment instance, this will returns the API request's response object, you can create a payemnt like this:
+After creating a Fib instance and authenticating, you can create a payment instance by calling the `create()` method from the payment instance, this will return the API request's response object, you can create a payment like this:
 
 ```js
 const payment = fib.payment
@@ -135,15 +135,15 @@ let paymentId = payment.paymentId;
 let paymentStatus = payment.status; // NO_PAYMENT | PAID | UNPAID | DECLINED
 ```
 
-## Geting payment status
+## Getting payment status
 
-you can fetch fresh information about your payemnt from the FIB's payemnt API service by calling the `getStatus()` method, the method returns the API request's response object, this will also updates the payment instance's fields data, for example:
+you can fetch fresh information about your payment from the FIB's payment API service by calling the `getStatus()` method, the method returns the API request's response object, which will also updates the payment instance's fields data, for example:
 
 ```js
 let paymentStatusResponse = await payment.geStatus();
 ```
 
-Example of a payment response data:
+Example of payment response data:
 
 ```js
 paymentStatusResponse.data = {
@@ -180,9 +180,9 @@ paymentStatusResponse.data = {
 }
 ```
 
-## Canceling payment
+## Canceling a payment
 
-To cancel the payemnt, you can call the `cancel()` method with your payment instance and this will cancel the payemnt from FIB and changed the status of payment instance to `DECLINED`, the method returns a boolan value, it returns `true` if the cancelation was successfull.
+To cancel the payment, you can call the `cancel()` method with your payment instance and this will cancel the payment from FIB and change the status of the payment instance to `DECLINED`, the method returns a boolean value, it returns `true` if the cancelation was successful.
 
 ```js
 let cancelPayment = payment.cancel(); // returns Boolean
