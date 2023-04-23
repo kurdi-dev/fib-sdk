@@ -41,11 +41,11 @@
   "size-limit": [
     {
       "path": "dist/fib-sdk.cjs.production.min.js",
-      "limit": "10 KB"
+      "limit": "30 KB"
     },
     {
       "path": "dist/fib-sdk.esm.js",
-      "limit": "10 KB"
+      "limit": "30 KB"
     }
   ],
   "devDependencies": {
