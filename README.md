@@ -1,103 +1,243 @@
-# DTS User Guide
+# FIB (First Iraqi Bank)'s payment SDK
 
-Congrats! You just saved yourself hours of work by bootstrapping this project with DTS. Let’s get you oriented with what’s here and how to use it.
+A Node.js sdk for First Iraqi Bank's online payment.
 
-> This DTS setup is meant for developing libraries (not apps!) that can be published to NPM. If you’re looking to build a Node app, you could use `ts-node-dev`, plain `ts-node`, or simple `tsc`.
+[![kurdi-dev - fib-sdk](https://img.shields.io/static/v1?label=kurdi-dev&message=fib-sdk&color=blue&logo=github)](https://github.com/kurdi-dev/fib-sdk 'Go to GitHub repo')
+[![contributions - welcome](https://img.shields.io/badge/contributions-welcome-blue)](/CONTRIBUTING.md 'Go to contributions doc')
+[![Made with Node.js](https://img.shields.io/badge/Node.js->=12-blue?logo=node.js&logoColor=white)](https://nodejs.org 'Go to Node.js homepage')
+[![Made with TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://typescriptlang.org 'Go to TypeScript homepage')
 
-> If you’re new to TypeScript, checkout [this handy cheatsheet](https://devhints.io/typescript)
+## Features
 
-## Commands
+- Authentication: Authentication of the user and the credentials you were given, and giving you a token for your future requests.
+- Payment Creation: Used to create a payment and getting QR codes and dynamic links to forward the user to the payment screen.
+- Checking payment status: Used to check the status of a payment.
+- Payment Cancellation: Used to cancel an active payment that has not been paid yet.
 
-DTS scaffolds your new library inside `/src`.
+All methods use promise meaning you can either use the `async...await` or `then...catch` or `try...catch`
 
-To run DTS, use:
+## Installation
+
+For Yarn
 
 ```bash
-npm start # or yarn start
+yarn add fib-sdk
 ```
 
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
+For NPM
 
-To do a one-off build, use `npm run build` or `yarn build`.
-
-To run tests, use `npm test` or `yarn test`.
-
-## Configuration
-
-Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
-
-### Jest
-
-Jest tests are set up to run with `npm test` or `yarn test`.
-
-### Bundle Analysis
-
-[`size-limit`](https://github.com/ai/size-limit) is set up to calculate the real cost of your library with `npm run size` and visualize the bundle with `npm run analyze`.
-
-#### Setup Files
-
-This is the folder structure we set up for you:
-
-```txt
-/src
-  index.ts        # EDIT THIS
-/test
-  index.test.ts   # EDIT THIS
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
+```bash
+npm install fib-sdk --save
 ```
 
-### Rollup
+## Usage
 
-DTS uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
+### ES Modules
 
-### TypeScript
+```ts
+import { Fib } from 'fib-sdk';
+const fib = new Fib();
+```
 
-`tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
-
-## Continuous Integration
-
-### GitHub Actions
-
-Two actions are added by default:
-
-- `main` which installs deps w/ cache, lints, tests, and builds on all pushes against a Node and OS matrix
-- `size` which comments cost comparison of your library on every pull request using [`size-limit`](https://github.com/ai/size-limit)
-
-## Optimizations
-
-Please see the main `dts` [optimizations docs](https://github.com/weiran-zsd/dts-cli#optimizations). In particular, know that you can take advantage of development-only optimizations:
+### CommonJS
 
 ```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
+const Fib = require('fib-sdk').Fib;
+const fib = new Fib();
+```
 
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
+OR
+
+```js
+const { Fib } = require('fib-sdk');
+const fib = new Fib();
+```
+
+## Authentication
+
+Authenticating with FIB using client_id and client_secret that you have recieved from FIB
+
+```ts
+await fib.authenticate(clientId:string, clientSecret:string);
+```
+
+You can get `status` and `accessToken` information from the payment instance, for example after successful authentication the Fib instance status field should equals READY
+
+```js
+let status = fib.status; // PENDING | INITIATED | READY | FAILED
+```
+
+### Create a payment instance
+
+After creating an Fib instance and authenticating, you can create a payment instance by calling the `create()` method from the payment instance, this will returns the API request's response object, you can create a payemnt like this:
+
+```js
+const payment = fib.payment
+const paymentResponse = await payment.create({
+  // Payment value and currency
+  monetaryValue: {
+    // the amount of the payment.
+    amount: number,
+     //  the currency of the payment; currently only IQD is supported currently.
+    currency: 'IQD' | 'USD',
+  },
+   // The callback url that FIB will send a POST request to when status of the created payment changes.
+   // Callback URL should be able to handle POST requests with request body that contains two properties:
+   // id : this will be the payment id.
+   // status : this will be the payment status.
+  statusCallbackUrl?: string,
+   // Description of the payment to help your customer to identify it in the FIB app, with the maximum length of 50 characters.
+  description?: string,
+  })
+```
+
+Example of a payment response data:
+
+```js
+paymentResponse.data = {
+
+  // A unique identifier of the payment.
+  paymentId: string,
+
+  // Expected values are: PAID | UNPAID | DECLINED.
+  status: string,
+
+  // an ISO-8601-formatted date-time string, representing a moment in time when the payment expires.
+  validUntil: string,
+
+  //a JSON object, containing two key-value pairs; the amount and currency of the payment.
+  amount: {
+    amount: number,
+    currency: string,
+  };
+
+   // Expected Values are:
+   // SERVER_FAILURE : Payment failure due to some internal error.
+   // PAYMENT_EXPIRATION : Payment has expired.
+   // PAYMENT_CANCELLATION : Payment canceled by the user.
+  decliningReason?: string,
+
+   // an ISO-8601-formatted date-time string, representing a moment in time when the payment is declined.
+  declinedAt?: string,
+
+   // a JSON object, containing two key-value pairs; the name and iban of the customer.
+  paidBy?: {
+    name: string;
+    iban: string;
+  },
 }
 ```
 
-You can also choose to install and use [invariant](https://github.com/weiran-zsd/dts-cli#invariant) and [warning](https://github.com/weiran-zsd/dts-cli#warning) functions.
+You can also get the `paymentId`, `qrCode`, `readableCode`, `personalAppLink`, `businessAppLink`, `corporateAppLink`, `validUntil`, `amount`, `currency`, and `status` informations from payment instance:
 
-## Module Formats
+```js
+let paymentId = payment.paymentId;
+let paymentStatus = payment.status; // NO_PAYMENT | PAID | UNPAID | DECLINED
+```
 
-CJS, ESModules, and UMD module formats are supported.
+## Geting payment status
 
-The appropriate paths are configured in `package.json` and `dist/index.js` accordingly. Please report if any issues are found.
+you can fetch fresh information about your payemnt from the FIB's payemnt API service by calling the `getStatus()` method, the method returns the API request's response object, this will also updates the payment instance's fields data, for example:
 
-## Named Exports
+```js
+let paymentStatusResponse = await payment.geStatus();
+```
 
-Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
+Example of a payment response data:
 
-## Including Styles
+```js
+paymentStatusResponse.data = {
 
-There are many ways to ship styles, including with CSS-in-JS. DTS has no opinion on this, configure how you like.
+  // A unique identifier of the payment.
+  paymentId: string,
 
-For vanilla CSS, you can include it at the root directory and add it to the `files` section in your `package.json`, so that it can be imported separately by your users and run through their bundler's loader.
+  // Expected values are: PAID | UNPAID | DECLINED.
+  status: string,
 
-## Publishing to NPM
+  // an ISO-8601-formatted date-time string, representing a moment in time when the payment expires.
+  validUntil: string,
 
-We recommend using [np](https://github.com/sindresorhus/np).
+  // a JSON object, containing two key-value pairs; the amount and currency of the payment.
+  amount: {
+    amount: number,
+    currency: string,
+  };
+
+  // Expected Values are:
+  // SERVER_FAILURE : Payment failure due to some internal error.
+  // PAYMENT_EXPIRATION : Payment has expired.
+  // PAYMENT_CANCELLATION : Payment canceled by the user.
+  decliningReason?: string,
+
+  // an ISO-8601-formatted date-time string, representing a moment in time when the payment is declined.
+  declinedAt?: string,
+
+  // a JSON object, containing two key-value pairs; the name and iban of the customer.
+  paidBy?: {
+    name: string,
+    iban: string,
+  }
+}
+```
+
+## Canceling payment
+
+To cancel the payemnt, you can call the `cancel()` method with your payment instance and this will cancel the payemnt from FIB and changed the status of payment instance to `DECLINED`, the method returns a boolan value, it returns `true` if the cancelation was successfull.
+
+```js
+let cancelPayment = payment.cancel(); // returns Boolean
+```
+
+## Develop and run Locally
+
+Clone the project
+
+```bash
+  https://github.com/kurdi-dev/fib-sdk.git
+```
+
+Go to the project directory
+
+```bash
+  cd fib-sdk
+```
+
+Install dependencies
+
+```bash
+  npm install # or yarn install
+```
+
+to run the project use:
+
+```bash
+  npm start # or yarn start
+```
+
+This builds to /dist and runs the project in watch mode so any edits you save inside src causes a rebuild to /dist.
+
+To do a one-off build, use:
+
+```bash
+npm run build # or yarn build
+```
+
+To run tests, use:
+
+```bash
+npm test # or yarn test
+```
+
+[`size-limit`](https://github.com/ai/size-limit) is set up to calculate the real cost of this library with `npm run size` and visualize the bundle with `npm run analyze`.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
+## Contributing
+
+Contributions are always welcome!
+
+## Report & Feedback
+
+If any issues are found or you have any feedback, please reach out to me at [walid@kurdi.dev](mailto://walid@kurdi.dev)

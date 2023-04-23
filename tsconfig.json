@@ -2,6 +2,16 @@
   "extends": "@tsconfig/recommended/tsconfig.json",
   "include": ["src", "types"],
   "compilerOptions": {
-    "module": "esnext",
+    "experimentalDecorators": true,
+    "target": "es6",
+    "module": "ES2015",
+    "moduleResolution": "node",
+    "declaration": true,
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "strict": true,
+    "checkJs": true,
+    "allowSyntheticDefaultImports": true,
+    "strictNullChecks": false
   }
 }
