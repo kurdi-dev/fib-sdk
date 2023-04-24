@@ -185,7 +185,7 @@ paymentStatusResponse.data = {
 To cancel the payment, you can call the `cancel()` method with your payment instance and this will cancel the payment from FIB and change the status of the payment instance to `DECLINED`, the method returns a boolean value, it returns `true` if the cancelation was successful.
 
 ```js
-let cancelPayment = payment.cancel(); // returns Boolean
+let cancelPayment = await payment.cancel(); // returns Boolean
 ```
 
 ## Develop and run Locally
@@ -225,10 +225,8 @@ npm run build # or yarn build
 To run tests, use:
 
 ```bash
-npm test # or yarn test
+npm run test # or yarn test
 ```
-
-[`size-limit`](https://github.com/ai/size-limit) is set up to calculate the real cost of this library with `npm run size` and visualize the bundle with `npm run analyze`.
 
 ## License
 
