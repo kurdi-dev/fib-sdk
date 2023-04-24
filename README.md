@@ -208,14 +208,6 @@ Install dependencies
   npm install # or yarn install
 ```
 
-to run the project use:
-
-```bash
-  npm start # or yarn start
-```
-
-This builds to /dist and runs the project in watch mode so any edits you save inside src causes a rebuild to /dist.
-
 To do a one-off build, use:
 
 ```bash
