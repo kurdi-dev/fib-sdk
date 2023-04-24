@@ -9,22 +9,23 @@ import * as qs from 'qs';
 
 export class Fib {
   private http: Axios;
-  public accessToken: string;
+  private accessToken: string;
+  private refreshToken: string;
   public status: string;
   public payment: Payment;
 
-  constructor() {
-    this.status = 'INITIATED';
+  constructor(private clientId: string, private clientSecret: string) {
+    this.status = 'INITIALIZED';
   }
 
-  async authenticate(clientId: string, clientSecret: string): Promise<void> {
-    await axios
+  async authenticate(): Promise<boolean> {
+    return await axios
       .post(
         'https://fib.stage.fib.iq/auth/realms/fib-online-shop/protocol/openid-connect/token',
         qs.stringify({
           grant_type: 'client_credentials',
-          client_id: clientId,
-          client_secret: clientSecret,
+          client_id: this.clientId,
+          client_secret: this.clientSecret,
         }),
         {
           headers: {
@@ -35,6 +36,7 @@ export class Fib {
       .then((response) => {
         if (response.data?.access_token) {
           this.accessToken = response.data.access_token;
+          this.refreshToken = response.data.refresh_token;
           this.http = axios.create({
             baseURL: 'https://fib.stage.fib.iq/protected/v1/payments',
             headers: {
@@ -42,11 +44,17 @@ export class Fib {
               Authorization: `Bearer ${this.accessToken}`,
             },
           });
-          this.payment = new Payment(this.http);
+          this.payment = new Payment(
+            this.http,
+            this.clientId,
+            this.clientSecret,
+            this.refreshToken,
+          );
           this.status = 'READY';
+          return true;
         } else {
           this.status = 'FAILED';
-          throw new Error('FIB Authentication failed!');
+          return false;
         }
       })
       .catch((error) => {

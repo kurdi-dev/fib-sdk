@@ -4,10 +4,11 @@ import {
   PaymentStatusQueryResponse,
 } from './interfaces';
 import { BadRequest } from '../interface';
-import { Axios } from 'axios';
+import axios, { Axios } from 'axios';
+import * as qs from 'qs';
 
 export default class Payment {
-  private readonly http: Axios;
+  private http: Axios;
   public paymentId = '';
   public qrCode = '';
   public readableCode = '';
@@ -19,13 +20,19 @@ export default class Payment {
   public currency: 'IQD' | 'USD' = 'IQD';
   public status = 'NO_PAYMENT';
 
-  constructor(http: Axios) {
+  constructor(
+    http: Axios,
+    private clientId: string,
+    private clientSecret: string,
+    private refreshToken: string,
+  ) {
     this.http = http;
   }
 
   async create(
     payload: CreatePaymentQueryParams,
   ): Promise<CreatePaymentQueryResponse | BadRequest> {
+    await this.refreshRequestTokens();
     return await this.http
       .post('/', JSON.stringify(payload))
       .then((response) => {
@@ -45,8 +52,22 @@ export default class Payment {
         return err;
       });
   }
+  async getStatusById(
+    paymentId: string,
+  ): Promise<PaymentStatusQueryResponse | BadRequest> {
+    await this.refreshRequestTokens();
+    return await this.http
+      .get(`/${paymentId}/status`)
+      .then(async (response) => {
+        return response;
+      })
+      .catch((err) => {
+        return err;
+      });
+  }
 
-  async geStatus(): Promise<PaymentStatusQueryResponse | BadRequest> {
+  async getStatus(): Promise<PaymentStatusQueryResponse | BadRequest> {
+    await this.refreshRequestTokens();
     return await this.http
       .get(`/${this.paymentId}/status`)
       .then((response) => {
@@ -59,6 +80,7 @@ export default class Payment {
   }
 
   async cancel(): Promise<boolean | BadRequest> {
+    await this.refreshRequestTokens();
     return await this.http
       .post(`/${this.paymentId}/cancel`)
       .then((response) => {
@@ -70,6 +92,43 @@ export default class Payment {
         }
       })
       .catch((err) => err);
+  }
+
+  async refreshRequestTokens() {
+    await axios
+      .post(
+        'https://fib.stage.fib.iq/auth/realms/fib-online-shop/protocol/openid-connect/token',
+        qs.stringify({
+          grant_type: 'refresh_token',
+          client_id: this.clientId,
+          client_secret: this.clientSecret,
+          refresh_token: this.refreshToken,
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        },
+      )
+      .then((response) => {
+        if (response.data?.access_token) {
+          this.refreshToken = response.data.refresh_token;
+          this.http = axios.create({
+            baseURL: 'https://fib.stage.fib.iq/protected/v1/payments',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${response.data?.access_token}`,
+            },
+          });
+        } else {
+          this.status = 'AUTH_FAILED';
+          throw new Error('FIB re-authentication failed!');
+        }
+      })
+      .catch((error) => {
+        this.status = 'AUTH_FAILED';
+        throw new Error('FIB re-authentication failed!');
+      });
   }
 
   async reset() {

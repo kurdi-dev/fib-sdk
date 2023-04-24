@@ -36,35 +36,35 @@ npm install fib-sdk --save
 
 ```ts
 import { Fib } from 'fib-sdk';
-const fib = new Fib();
+const fib = new Fib(clientId:string, clientSecret:string);
 ```
 
 ### CommonJS
 
-```js
+```ts
 const Fib = require('fib-sdk').Fib;
-const fib = new Fib();
+const fib = new Fib(clientId:string, clientSecret:string);
 ```
 
 OR
 
-```js
+```ts
 const { Fib } = require('fib-sdk');
-const fib = new Fib();
+const fib = new Fib(clientId:string, clientSecret:string);
 ```
 
 ## Authentication
 
-Authenticating with FIB using client_id and client_secret that you have received from FIB
+Authenticating with FIB using your `client_id` and `client_secret` that you have provided while creating the Fib instance, simply call the `authenticate()` method, it will return `true` if successfull.
 
 ```ts
-await fib.authenticate(clientId:string, clientSecret:string);
+await fib.authenticate(); // returns boolean
 ```
 
-You can get `status` and `accessToken` information from the payment instance, for example after successful authentication the Fib instance status field should equal `READY`
+You can get `status` information from the fib instance, for example after successful authentication the Fib instance status field should equal `READY`
 
 ```js
-let status = fib.status; // PENDING | INITIATED | READY | FAILED
+let status = fib.status; // INITIALIZED | READY | FAILED
 ```
 
 ### Create a payment instance
@@ -132,7 +132,7 @@ You can also get the `paymentId`, `qrCode`, `readableCode`, `personalAppLink`, `
 
 ```js
 let paymentId = payment.paymentId;
-let paymentStatus = payment.status; // NO_PAYMENT | PAID | UNPAID | DECLINED
+let paymentStatus = payment.status; // NO_PAYMENT | PAID | UNPAID | AUTH_FAILD | DECLINED
 ```
 
 ## Getting payment status
@@ -140,7 +140,7 @@ let paymentStatus = payment.status; // NO_PAYMENT | PAID | UNPAID | DECLINED
 you can fetch fresh information about your payment from the FIB's payment API service by calling the `getStatus()` method, the method returns the API request's response object, which will also updates the payment instance's fields data, for example:
 
 ```js
-let paymentStatusResponse = await payment.geStatus();
+let paymentStatusResponse = await payment.getStatus();
 ```
 
 Example of payment response data:
@@ -180,12 +180,19 @@ paymentStatusResponse.data = {
 }
 ```
 
-## Canceling a payment
-
-To cancel the payment, you can call the `cancel()` method with your payment instance and this will cancel the payment from FIB and change the status of the payment instance to `DECLINED`, the method returns a boolean value, it returns `true` if the cancelation was successful.
+### You can also get status information of your previous payments by their paymentId
 
 ```js
-let cancelPayment = await payment.cancel(); // returns Boolean
+const paymentStatusByIdResponse = await payment.getStatusById(paymentId:number);
+console.log(paymentStatusByIdResponse.data);
+```
+
+## Canceling a payment
+
+To cancel a created payment, you can call the `cancel()` method with your payment instance and this will cancel the payment from FIB and change the status of the payment instance to `DECLINED`, the method returns a boolean value, it returns `true` if the cancelation was successful.
+
+```js
+let cancelPayment = await payment.cancel(); // returns boolean
 ```
 
 ## Develop and run Locally
