@@ -7,7 +7,7 @@ A Node.js SDK for First Iraqi Bank's online payment.
 [![Made with Node.js](https://img.shields.io/badge/Node.js->=12-blue?logo=node.js&logoColor=white)](https://nodejs.org 'Go to Node.js homepage')
 [![Made with TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://typescriptlang.org 'Go to TypeScript homepage')
 
-![fib-banner](https://github.com/kurdi-dev/fb-sdk/blob/main/fib-banner.png?raw=true)
+![fib-banner](https://github.com/kurdi-dev/fib-sdk/blob/main/fib-banner.png?raw=true)
 
 ## Features
 
