@@ -6,6 +6,10 @@ import {
 import { BadRequest } from '../interface';
 import axios, { Axios } from 'axios';
 import * as qs from 'qs';
+import dotenv from 'dotenv';
+import fs from 'fs';
+
+dotenv.config();
 
 export default class Payment {
   private http: Axios;
@@ -21,13 +25,21 @@ export default class Payment {
   public status = 'NO_PAYMENT';
 
   constructor(
-    http: Axios,
-    private clientId: string,
-    private clientSecret: string,
-    private refreshToken: string,
-  ) {
-    this.http = http;
-  }
+    refreshToken: string,
+   ) {
+      const clientId = process.env.CLIENT_ID;
+      const clientSecret = fs.readFileSync(process.env.CLIENT_SECRET_FILE_PATH, 'utf8').split('=')[1];
+      this.http = axios.create({
+        baseURL: 'https://fib.stage.fib.iq/protected/v1/payments',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      this.refreshToken = refreshToken;
+      this.clientId = clientId;
+      this.clientSecret = clientSecret;
+    }
+
 
   async create(
     payload: CreatePaymentQueryParams,
