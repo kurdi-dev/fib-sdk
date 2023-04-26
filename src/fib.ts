@@ -1,6 +1,8 @@
 import axios, { Axios } from 'axios';
 import Payment from './payment/payment';
 import * as qs from 'qs';
+import * as dotenv from 'dotenv';
+import * as fs from 'fs';
 
 /**
  * FIB SDK
@@ -14,7 +16,9 @@ export class Fib {
   public status: string;
   public payment: Payment;
 
-  constructor(private clientId: string, private clientSecret: string) {
+  constructor() {
+    this.clientId = process.env.CLIENT_ID;
+    this.clientSecret = fs.readFileSync('/path/to/secret/file', 'utf8');
     this.status = 'INITIALIZED';
   }
 
