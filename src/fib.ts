@@ -17,8 +17,9 @@ export class Fib {
   public payment: Payment;
 
   constructor() {
+    dotenv.config();
     this.clientId = process.env.CLIENT_ID;
-    this.clientSecret = fs.readFileSync('/path/to/secret/file', 'utf8');
+    this.clientSecret = fs.readFileSync('.env', 'utf8').split('=')[1];
     this.status = 'INITIALIZED';
   }
 
