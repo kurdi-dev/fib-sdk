@@ -25,6 +25,8 @@ export default class Payment {
     private clientId: string,
     private clientSecret: string,
     private refreshToken: string,
+    private authUrl: string,
+    private paymentsUrl: string,
   ) {
     this.http = http;
   }
@@ -97,7 +99,7 @@ export default class Payment {
   async refreshRequestTokens() {
     await axios
       .post(
-        'https://fib.stage.fib.iq/auth/realms/fib-online-shop/protocol/openid-connect/token',
+        this.authUrl,
         qs.stringify({
           grant_type: 'refresh_token',
           client_id: this.clientId,
@@ -114,7 +116,7 @@ export default class Payment {
         if (response.data?.access_token) {
           this.refreshToken = response.data.refresh_token;
           this.http = axios.create({
-            baseURL: 'https://fib.stage.fib.iq/protected/v1/payments',
+            baseURL: this.paymentsUrl,
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${response.data?.access_token}`,

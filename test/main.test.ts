@@ -1,12 +1,12 @@
 import { Fib } from '../src/index';
 
 // your fib cleint
-const client_id = 'medusa-js';
+const client_id = 'your_client_id';
 // your fib secret
-const client_secret = '2c1c8b35-a5e5-481b-a05c-f2252d1defdc';
+const client_secret = 'your_client_secret';
 
 describe('Testing payment process', () => {
-  const fib = new Fib(client_id, client_secret);
+  const fib = new Fib(client_id, client_secret, true);
 
   it('creating an Fib class instance, authenticating, creating a payment, getting status and canceling the payment', async () => {
     await fib.authenticate();

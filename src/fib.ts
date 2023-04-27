@@ -11,17 +11,29 @@ export class Fib {
   private http: Axios;
   private accessToken: string;
   private refreshToken: string;
+  private authUrl: string;
+  private paymentsUrl: string;
   public status: string;
   public payment: Payment;
 
-  constructor(private clientId: string, private clientSecret: string) {
+  constructor(
+    private clientId: string,
+    private clientSecret: string,
+    private sandbox: boolean = false,
+  ) {
     this.status = 'INITIALIZED';
+    this.authUrl = this.sandbox
+      ? 'https://fib.stage.fib.iq/auth/realms/fib-online-shop/protocol/openid-connect/token'
+      : 'https://fib.prod.fib.iq/auth/realms/fib-online-shop/protocol/openid-connect/token';
+    this.paymentsUrl = this.sandbox
+      ? 'https://fib.stage.fib.iq/protected/v1/payments'
+      : 'https://fib.prod.fib.iq/protected/v1/payments';
   }
 
   async authenticate(): Promise<boolean> {
     return await axios
       .post(
-        'https://fib.stage.fib.iq/auth/realms/fib-online-shop/protocol/openid-connect/token',
+        this.authUrl,
         qs.stringify({
           grant_type: 'client_credentials',
           client_id: this.clientId,
@@ -38,7 +50,7 @@ export class Fib {
           this.accessToken = response.data.access_token;
           this.refreshToken = response.data.refresh_token;
           this.http = axios.create({
-            baseURL: 'https://fib.stage.fib.iq/protected/v1/payments',
+            baseURL: this.paymentsUrl,
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${this.accessToken}`,
@@ -49,6 +61,8 @@ export class Fib {
             this.clientId,
             this.clientSecret,
             this.refreshToken,
+            this.authUrl,
+            this.paymentsUrl,
           );
           this.status = 'READY';
           return true;
