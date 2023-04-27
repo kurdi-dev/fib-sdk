@@ -38,22 +38,24 @@ npm install fib-sdk --save
 
 ```ts
 import { Fib } from 'fib-sdk';
-const fib = new Fib(clientId:string, clientSecret:string);
+const fib = new Fib(clientId:string, clientSecret:string, sandbox?:boolean);
 ```
 
 ### CommonJS
 
 ```ts
 const Fib = require('fib-sdk').Fib;
-const fib = new Fib(clientId:string, clientSecret:string);
+const fib = new Fib(clientId:string, clientSecret:string, sandbox?:boolean);
 ```
 
 OR
 
 ```ts
 const { Fib } = require('fib-sdk');
-const fib = new Fib(clientId:string, clientSecret:string);
+const fib = new Fib(clientId:string, clientSecret:string, sandbox?:boolean);
 ```
+
+PS: If you're in a development environment or testing the package make sure to set the `sandbox` parameter to `true` while initializing the Fib instance, incase of production environment, you can set it to `false` or leave it since it's defaulted to `false`.
 
 ## Authentication
 
