@@ -15,6 +15,7 @@ A Node.js SDK for First Iraqi Bank's online payment.
 - Payment Creation: Used to create a payment and getting QR codes and dynamic links to forward the user to the payment screen.
 - Checking payment status: Used to check the status of a payment.
 - Payment Cancellation: Used to cancel an active payment that has not been paid yet.
+- Payment Refund: Used to refund a paid payment.
 
 All methods use promise meaning you can either use the `async...await` or `then...catch` or `try...catch`
 
@@ -210,6 +211,14 @@ To refund a created payment, you can call the `refund()` method with your paymen
 
 ```js
 let refundPayment = await payment.refund(); // returns boolean
+```
+
+## Refunding a payment by ID
+You can also refund previous payments by their paymentId, you can call `refundById()` method as it follows:
+
+```js
+const refundPayment = await payment.refundById(paymentId:string);
+console.log(refundPayment); // returns boolean
 ```
 
 ## Develop and run Locally
