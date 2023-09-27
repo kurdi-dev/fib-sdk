@@ -15,6 +15,7 @@ A Node.js SDK for First Iraqi Bank's online payment.
 - Payment Creation: Used to create a payment and getting QR codes and dynamic links to forward the user to the payment screen.
 - Checking payment status: Used to check the status of a payment.
 - Payment Cancellation: Used to cancel an active payment that has not been paid yet.
+- Payment Refund: Used to refund a paid payment.
 
 All methods use promise meaning you can either use the `async...await` or `then...catch` or `try...catch`
 
@@ -155,7 +156,7 @@ paymentStatusResponse.data = {
   // A unique identifier of the payment.
   paymentId: string,
 
-  // Expected values are: PAID | UNPAID | DECLINED.
+  // Expected values are: PAID | UNPAID | DECLINED | REFUND_REQUESTED | REFUNDED.
   status: string,
 
   // an ISO-8601-formatted date-time string, representing a moment in time when the payment expires.
@@ -199,6 +200,25 @@ To cancel a created payment, you can call the `cancel()` method with your paymen
 
 ```js
 let cancelPayment = await payment.cancel(); // returns boolean
+```
+
+## Refunding a payment
+To refund a created payment, you can call the `refund()` method with your payment instance and this will refund the payment from FIB and change the status of the payment instance to `REFUND_REQUESTED`, after a short of time status will change to `REFUNDED` and the amount will be refunded, The method returns a boolean value, it returns `true` if the refund was susccessful, if payment is not paid it will return `false`.
+
+### Notes
+- Only Payments with `PAID` status can be refunded.
+- Only payments that was paid in the last 24 hours can be refunded.
+
+```js
+let refundPayment = await payment.refund(); // returns boolean
+```
+
+## Refunding a payment by ID
+You can also refund previous payments by their paymentId, you can call `refundById()` method as it follows:
+
+```js
+const refundPayment = await payment.refundById(paymentId:string);
+console.log(refundPayment); // returns boolean
 ```
 
 ## Develop and run Locally
