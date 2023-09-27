@@ -115,6 +115,25 @@ export default class Payment {
       });
   }
 
+  async refundById(paymentId: string): Promise<boolean | BadRequest> {
+    await this.refreshRequestTokens();
+    return await this.http
+      .post(`/${paymentId}/refund`)
+      .then((response) => {
+        if (response.status === 202) {
+          this.reset();
+          return true;
+        } 
+        return false;
+      })
+      .catch((err) => {
+        if (err?.response?.data?.errors[0]?.code == 'TRANSACTION_STATUS_IS_NOT_PAID') {
+            return false;
+        }
+        return err;
+      });
+  }
+
   async refreshRequestTokens() {
     await axios
       .post(
