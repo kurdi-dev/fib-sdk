@@ -75,5 +75,9 @@ describe('Testing refund proccess', () => {
     // note it's not fully testable because there is no way you can pay using tests so then you can check if it's actually refunded.
     const isRefunded = await payment.refund();
     expect(isRefunded).toEqual(false);
+
+    // refund payment by Id
+    const refundById = await payment.refundById(payment.paymentId);
+    expect(refundById).toEqual(false);
   });
 });
