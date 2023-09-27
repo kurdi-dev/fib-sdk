@@ -38,15 +38,15 @@ export default class Payment {
     return await this.http
       .post('/', JSON.stringify(payload))
       .then((response) => {
-        this.paymentId = response.data.paymentId;
-        this.qrCode = response.data.qrCode;
-        this.readableCode = response.data.readableCode;
-        this.personalAppLink = response.data.personalAppLink;
-        this.businessAppLink = response.data.businessAppLink;
-        this.corporateAppLink = response.data.corporateAppLink;
-        this.validUntil = response.data.validUntil;
-        this.amount = payload.monetaryValue.amount;
-        this.currency = payload.monetaryValue.currency;
+        this.paymentId = response.data?.paymentId;
+        this.qrCode = response.data?.qrCode;
+        this.readableCode = response.data?.readableCode;
+        this.personalAppLink = response.data?.personalAppLink;
+        this.businessAppLink = response.data?.businessAppLink;
+        this.corporateAppLink = response.data?.corporateAppLink;
+        this.validUntil = response.data?.validUntil;
+        this.amount = payload.monetaryValue?.amount;
+        this.currency = payload.monetaryValue?.currency;
         this.status = 'UNPAID';
         return response;
       })
@@ -102,14 +102,17 @@ export default class Payment {
       .post(`/${this.paymentId}/refund`)
       .then((response) => {
         if (response.status === 202) {
-          this.reset();
+          this.status = 'PENDING_REFUND';
           return true;
-        } 
+        }
         return false;
       })
       .catch((err) => {
-        if (err?.response?.data?.errors[0]?.code == 'TRANSACTION_STATUS_IS_NOT_PAID') {
-            return false;
+        if (
+          err?.response?.data?.errors[0]?.code ==
+          'TRANSACTION_STATUS_IS_NOT_PAID'
+        ) {
+          return false;
         }
         return err;
       });
@@ -121,14 +124,16 @@ export default class Payment {
       .post(`/${paymentId}/refund`)
       .then((response) => {
         if (response.status === 202) {
-          this.reset();
           return true;
-        } 
+        }
         return false;
       })
       .catch((err) => {
-        if (err?.response?.data?.errors[0]?.code == 'TRANSACTION_STATUS_IS_NOT_PAID') {
-            return false;
+        if (
+          err?.response?.data?.errors[0]?.code ==
+          'TRANSACTION_STATUS_IS_NOT_PAID'
+        ) {
+          return false;
         }
         return err;
       });
